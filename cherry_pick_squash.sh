@@ -19,6 +19,9 @@ SQUASH_COMMIT_MESSAGE=$4
 # Get the current branch name
 CURRENT_BRANCH=$(git branch --show-current)
 
+# Get the date of the to-commit-sha
+TO_COMMIT_DATE=$(git show -s --format=%ci "$TO_COMMIT")
+
 # Create a temporary branch from the starting commit
 echo "Creating temporary branch '$TEMP_BRANCH' from commit $FROM_COMMIT"
 git checkout -b "$TEMP_BRANCH" "$FROM_COMMIT"
@@ -30,16 +33,16 @@ git cherry-pick "$FROM_COMMIT"^.."$TO_COMMIT"
 # Squash all the commits into one
 echo "Squashing all the commits into one commit"
 git reset --soft "$FROM_COMMIT"^
-git commit -m "$SQUASH_COMMIT_MESSAGE"
+GIT_AUTHOR_DATE="$TO_COMMIT_DATE" GIT_COMMITTER_DATE="$TO_COMMIT_DATE" git commit -m "$SQUASH_COMMIT_MESSAGE"
 
 # Checkout the original branch
 echo "Checking out the original branch '$CURRENT_BRANCH'"
 git checkout "$CURRENT_BRANCH"
 
-# Merge the squashed commit into the original branch
-echo "Merging the squashed commit into '$CURRENT_BRANCH'"
-git merge --squash "$TEMP_BRANCH"
-git commit -m "$SQUASH_COMMIT_MESSAGE"
+# Merge the squashed commit just after the starting commit
+echo "Merging the squashed commit after $FROM_COMMIT"
+git checkout "$FROM_COMMIT"
+git cherry-pick "$TEMP_BRANCH"
 
 # Delete the temporary branch
 echo "Deleting temporary branch '$TEMP_BRANCH'"
