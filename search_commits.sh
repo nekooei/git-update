@@ -37,9 +37,10 @@ while [[ "$1" != "" ]]; do
   shift
 done
 
-# Check if at least a search pattern or author email was provided
-if [ -z "$SEARCH_PATTERN" ] && [ -z "$AUTHOR_EMAIL" ]; then
-  usage
+# Ensure we are in a Git repository
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  echo "Error: This is not a valid Git repository."
+  exit 1
 fi
 
 # Build the git log command
