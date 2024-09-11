@@ -9,11 +9,33 @@ This bundle contains three useful Git-related bash scripts:
 
 ---
 
-## Script 1: `update_commit.sh`
+## Installation
+
+To install the scripts globally on your system, run the following installation script. This will install the scripts to `/usr/local/bin` and make them available as commands you can use anywhere:
+
+### Steps to Install:
+
+1. Save the `install_git_scripts.sh` script and the other scripts (`update_commit.sh`, `search_commits.sh`, and `cherry_pick_squash.sh`) in the same directory.
+
+2. Run the installation script with `sudo`:
+
+   ```bash
+   sudo ./install_git_scripts.sh
+   ```
+
+This will install the following commands:
+
+- `update_commit`: For updating a specific commit.
+- `search_commits`: For searching through commit messages, patterns, and authors.
+- `cherry_pick_squash`: For cherry-picking and squashing commits into a single commit.
+
+---
+
+## Script 1: `update_commit`
 
 ### Usage
 ```bash
-./update_commit.sh <commit-sha> "<new-message>" "[new-author]"
+update_commit <commit-sha> "<new-message>" "[new-author]"
 ```
 
 - **commit-sha**: The SHA of the commit you want to update.
@@ -22,18 +44,16 @@ This bundle contains three useful Git-related bash scripts:
 
 ### Example
 ```bash
-./update_commit.sh abc123 "Fixed login issue" "John Doe <john@example.com>"
+update_commit abc123 "Fixed login issue" "John Doe <john@example.com>"
 ```
-
-This will change the commit message of the commit `abc123` and also change the author if provided.
 
 ---
 
-## Script 2: `search_commits.sh`
+## Script 2: `search_commits`
 
 ### Usage
 ```bash
-./search_commits.sh [-e|--exact] [-i|--insensitive] [-a|--author <author-email>] [<string-pattern>]
+search_commits [-e|--exact] [-i|--insensitive] [-a|--author <author-email>] [<string-pattern>]
 ```
 
 - **-e | --exact**: Search for an exact commit message match.
@@ -45,31 +65,31 @@ This will change the commit message of the commit `abc123` and also change the a
 
 - Search for commits with messages containing "bugfix":
   ```bash
-  ./search_commits.sh "bugfix"
+  search_commits "bugfix"
   ```
 
 - Search for exact commit messages:
   ```bash
-  ./search_commits.sh -e "Fixed login bug"
+  search_commits -e "Fixed login bug"
   ```
 
 - Search for commits by a specific author:
   ```bash
-  ./search_commits.sh -a "john@example.com"
+  search_commits -a "john@example.com"
   ```
 
 - Perform a case-insensitive search:
   ```bash
-  ./search_commits.sh -i "fix"
+  search_commits -i "fix"
   ```
 
 ---
 
-## Script 3: `cherry_pick_squash.sh`
+## Script 3: `cherry_pick_squash`
 
 ### Usage
 ```bash
-./cherry_pick_squash.sh <from-commit-sha> <to-commit-sha> <temporary-branch-name> "<squash-commit-message>"
+cherry_pick_squash <from-commit-sha> <to-commit-sha> <temporary-branch-name> "<squash-commit-message>"
 ```
 
 - **from-commit-sha**: The SHA of the starting commit in the range you want to squash.
@@ -79,7 +99,7 @@ This will change the commit message of the commit `abc123` and also change the a
 
 ### Example
 ```bash
-./cherry_pick_squash.sh abc123 def456 temp-branch "Merged feature updates"
+cherry_pick_squash abc123 def456 temp-branch "Merged feature updates"
 ```
 
 This script will:
@@ -89,8 +109,6 @@ This script will:
 4. Merge the squashed commit into the original branch.
 5. Delete the temporary branch.
 6. Remove the original commits from history by rebasing.
-
-**Important**: The script rewrites history, so use it with caution, especially when working on shared repositories.
 
 ---
 
