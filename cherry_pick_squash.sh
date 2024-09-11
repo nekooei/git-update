@@ -6,7 +6,7 @@ usage() {
   exit 1
 }
 
-# Check if correct number of arguments is provided
+# Check if the correct number of arguments is provided
 if [ $# -lt 4 ]; then
   usage
 fi
@@ -15,6 +15,12 @@ FROM_COMMIT=$1
 TO_COMMIT=$2
 TEMP_BRANCH=$3
 SQUASH_COMMIT_MESSAGE=$4
+
+# Ensure we are in a Git repository
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  echo "Error: This is not a valid Git repository."
+  exit 1
+fi
 
 # Get the current branch name
 CURRENT_BRANCH=$(git branch --show-current)
@@ -48,8 +54,29 @@ git cherry-pick "$TEMP_BRANCH"
 echo "Deleting temporary branch '$TEMP_BRANCH'"
 git branch -D "$TEMP_BRANCH"
 
-# Optionally delete the original commits from history
-echo "Deleting commits from history"
-git rebase --onto "$FROM_COMMIT"^ "$TO_COMMIT" "$CURRENT_BRANCH"
+# Rebase to drop the original commits from history and resolve conflicts by accepting incoming changes
+echo "Rebasing to drop the original commits"
+
+# Start the rebase process
+git rebase --onto "$FROM_COMMIT" "$TO_COMMIT"^ "$CURRENT_BRANCH"
+
+# Handle conflicts by accepting incoming changes automatically
+while [ $? -ne 0 ]; do
+    echo "Conflict detected. Accepting incoming changes (from cherry-pick)..."
+    
+    # Resolve conflicts by accepting incoming changes for all conflicting files
+    git diff --name-only --diff-filter=U | while read -r file; do
+        git checkout --theirs "$file"
+    done
+    
+    # Add the resolved files
+    git add .
+
+    # Amend the commit message to always use the provided squash commit message
+    git commit --amend -m "$SQUASH_COMMIT_MESSAGE"
+
+    # Continue the rebase
+    git rebase --continue
+done
 
 echo "Process completed successfully!"
