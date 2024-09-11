@@ -15,7 +15,7 @@ To install the scripts globally on your system, run the following installation s
 
 ### Steps to Install:
 
-1. Save the `install_git_scripts.sh` script and the other scripts (`update_commit.sh`, `search_commits.sh`, and `cherry_pick_squash.sh`) in the same directory.
+1. clone repository
 
 2. Run the installation script with `sudo`:
 
